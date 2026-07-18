@@ -37,7 +37,6 @@ jobs:
 
       - uses: docker/bake-action@v7
         with:
-          source: cwd://
           files: |
             ./compose.yaml
             ./compose.dev.yaml
