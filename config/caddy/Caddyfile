@@ -1,0 +1,25 @@
+{
+	frankenphp
+}
+
+:80 {
+	@blocked {
+		path /cache/*
+		path /languages/*
+		path /maintenance/*
+		path /serialized/*
+		path /images/deleted/*
+		path /images/temp/*
+		path /includes/*
+	}
+	respond @blocked 403
+
+	php_server {
+		root /var/www/html
+	}
+}
+
+:9090 {
+	root * /internal
+	php_server
+}

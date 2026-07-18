@@ -1,0 +1,72 @@
+[config]
+## 설치 시 사용할 기본 브랜치 이름입니다.
+## 미디어위키의 버전 별 브랜치 이름은 1.45 -> "REL1_45" 와 같은 규칙을 가지고 있습니다.
+mediawiki_version = "REL1_46"
+max_concurrent = 5
+
+## 미디어위키 코어에 번들된 확장 중 활성화할 확장을 지정합니다.
+## 사용 가능한 전체 목록은 아래 링크를 참고하세요.
+## https://www.mediawiki.org/wiki/Bundled_extensions_and_skins
+
+[bundled_extensions]
+CategoryTree = {}
+Cite = {}
+CodeEditor = {}
+ConfirmEdit = {}
+DiscussionTools = {}
+Echo = {}
+Gadgets = {}
+InputBox = {}
+Linter = {}
+LoginNotify = {}
+Nuke = {}
+OATHAuth = {}
+PageImages = {}
+ParserFunctions = {}
+Poem = {}
+ReplaceText = {}
+Scribunto = {}
+SyntaxHighlight_GeSHi = {}
+TemplateData = {}
+TemplateStyles = {}
+TextExtracts = {}
+VisualEditor = {}
+WikiEditor = {}
+
+[bundled_skins]
+Vector = {}
+
+## 설치 스크립트로 설치할 추가 서드파티 확장 및 스킨을 지정합니다.
+## 위키미디어 gerrit에 없는 확장의 경우 직접 Git url을 지정해야 합니다.
+## 파일 맨 위의 mediawiki_version에 따라 브랜치가 지정되며 없는 경우 main/master 브랜치로 폴백됩니다.
+## 특정 브랜치에 대한 요구사항이 있다면 <branch = "REL1_44">와 같이 변경할 수 있습니다.
+## 서브모듈 초기화가 필요한 확장의 경우 submodules = true 옵션을 지정하세요.
+## latest_tag = true 옵션을 사용 시 최신 버전으로 지정된 태그가 사용됩니다. (현재 Gerrit / Github만 지원)
+
+[extensions]
+AdminLinks = {branch = "master"}
+ArrayFunctions = {}
+Cargo = {branch = "master"}
+Changpopwiki = {url = "https://github.com/Changpopwiki/extension"}
+CharInsert = {}
+CodeMirror = {}
+DataTransfer = {branch = "master"}
+DISPLAYCAT = {url = "https://github.com/tesinormed/mediawiki-extensions-DISPLAYCAT.git"}
+DisplayTitle = {}
+EmbedVideo = {url = "https://github.com/StarCitizenWiki/mediawiki-extensions-EmbedVideo", latest_tag = true}
+ExternalData = {branch = "master"}
+Josa = {}
+PageForms = {branch = "master"}
+ParserPower = {url = "https://github.com/wiki-gg-oss/mediawiki-extensions-ParserPower"}
+Popups = {}
+RedirectManager = {latest_tag = true}
+ShortDescription = {url = "https://github.com/StarCitizenTools/mediawiki-extensions-ShortDescription"}
+TabberNeue = {url = "https://github.com/StarCitizenTools/mediawiki-extensions-TabberNeue", latest_tag = true}
+TemplateSandbox = {}
+TemplateWizard = {}
+Thumbro = {url = "https://github.com/StarCitizenTools/mediawiki-extensions-Thumbro", latest_tag = true}
+UseResource = {}
+Variables = {}
+
+[skins]
+Citizen = {url = "https://github.com/StarCitizenTools/mediawiki-skins-Citizen", latest_tag = true}

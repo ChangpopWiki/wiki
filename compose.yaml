@@ -1,0 +1,114 @@
+x-volumes:
+  # Caddyfile용 디렉토리 마운트
+  - &caddyfile ./config/caddy:/etc/caddy
+  # 미디어위키 이미지 디렉토리 볼륨
+  - &mediawiki_images ./data/images:/var/www/html/images
+  # LocalSettings.php 및 기타 설정 파일을 위한 볼륨
+  - &mediawiki_config ./config/mediawiki:/config
+  # 별도의 확장 로더 파일
+  - &extensions-loader extensions_loader:/var/www/html/extensions-loader
+  # 미디어위키 코어에 번들되지 않은 확장과 스킨을 위한 볼륨
+  - &non_bundled_extensions non_bundled_extensions:/non-bundled
+  # 로고 파일 마운트
+  - &logo ./resources/logo.svg:/var/www/html/resources/assets/logo.svg
+
+x-setup-base: &x-setup-base
+  image: ghcr.io/changpopwiki/wiki-setup:latest
+  volumes:
+    - *non_bundled_extensions
+    - *extensions-loader
+    - *mediawiki_config
+
+services:
+  mediawiki:
+    image: ghcr.io/changpopwiki/wiki-mediawiki:latest
+    restart: always
+    depends_on:
+      database:
+        condition: service_started
+      setup:
+        condition: service_completed_successfully
+    env_file:
+      - path: .env
+        required: true
+    volumes:
+      - *caddyfile
+      - *mediawiki_images
+      - *mediawiki_config
+      - *non_bundled_extensions
+      - *extensions-loader
+      - *logo
+    networks:
+      chp_proxy:
+      default:
+
+  setup:
+    <<: *x-setup-base
+    command:
+      sh -c "install-extensions --generate-loader && install-extensions --check || install-extensions"
+
+  setup-force:
+    <<: *x-setup-base
+    restart: no
+    profiles: [force-setup]
+    command:
+      sh -c "install-extensions --generate-loader && install-extensions"
+
+  database:
+    image: mariadb:lts-ubi
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      CARGOUSER_PASSWORD: ${CARGOUSER_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./build-context/database/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+
+  backup:
+    image: ghcr.io/changpopwiki/wiki-backup:latest
+    restart: always
+    depends_on:
+      database:
+        condition: service_started
+      mediawiki:
+        condition: service_started
+    environment:
+      # DB 연결 정보
+      - MARIADB_HOST=database
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+
+      # 매일 06시에 백업 실행
+      - CRON_TIME=0 6 * * *
+
+      # 일간 백업 보존 개수
+      - MAX_DAILY_BACKUPS=${MAX_DAILY_BACKUPS}
+
+      # rclone 환경 변수
+      - RCLONE_CONFIG_B2_TYPE=b2
+      - RCLONE_CONFIG_B2_ACCOUNT=${B2_KEY_ID}
+      - RCLONE_CONFIG_B2_KEY=${B2_KEY}
+      - RCLONE_REMOTE=B2:${B2_BUCKET_NAME}${B2_BUCKET_PATH}
+
+      # 페이지 백업용 환경변수
+      - GITHUB_APP_ID=${BACKUP_PAGES_GITHUB_APP_ID}
+      - GITHUB_INSTALLATION_ID=${BACKUP_PAGES_GITHUB_INSTALLATION_ID}
+      - GITHUB_REPO=${BACKUP_PAGES_GITHUB_REPO}
+      - GITHUB_SECRET_KEY_PATH=/run/secrets/backup-pages-github-app-pem
+    volumes:
+      - ./data/db_dump:/backup
+    secrets:
+      - backup-pages-github-app-pem
+
+volumes:
+  db_data:
+  non_bundled_extensions:
+  extensions_loader:
+
+networks:
+  chp_proxy:
+    external: true
+
+secrets:
+  backup-pages-github-app-pem:
+    file: ./secrets/backup-pages-github-app.pem
