@@ -13,6 +13,7 @@ on:
       - 'build-context/**'
       - 'compose.yaml'
       - 'compose.dev.yaml'
+      - 'docker-bake.hcl'
 
 env:
   PUSH_TO_REGISTRY: ${{ github.event_name == 'push' || inputs.push_to_registry }}
@@ -36,13 +37,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/bake-action@v7
+        env:
+          GIT_SHA: ${{ github.sha }}
         with:
           files: |
             ./compose.yaml
             ./compose.dev.yaml
+            ./docker-bake.hcl
           push: ${{ env.PUSH_TO_REGISTRY == 'true' }}
-          set: |
-            *.platform=linux/amd64,linux/arm64
-            *.tags=latest,${{ github.sha }}
-            *.cache-from=type=gha
-            *.cache-to=type=gha,mode=max
