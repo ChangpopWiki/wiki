@@ -239,7 +239,6 @@ async def install(
     name = target.name
     base_dir = EXT_DIR if kind == "extensions" else SKIN_DIR
     dest = f"{base_dir}/{name}"
-    os.makedirs(base_dir, exist_ok=True)
 
     url = target.url or f"https://gerrit.wikimedia.org/r/mediawiki/{kind}/{name}"
     primary = target.branch or cfg.mediawiki_version
@@ -341,6 +340,8 @@ async def needs_sync(cfg: Config) -> bool:
 
 async def main():
     cfg = load_config()
+    os.makedirs(EXT_DIR, exist_ok=True)
+    os.makedirs(SKIN_DIR, exist_ok=True)
 
     if "--generate-loader" in sys.argv:
         generate_php(cfg)
