@@ -30,6 +30,9 @@ target "images" {
     "org.opencontainers.image.vendor" = "ChangpopWiki"
     "org.opencontainers.image.description" = "창팝위키 미디어위키 스택에서 ${item} 서비스에 사용되는 커스텀 이미지입니다."
   }
+  annotations = [
+    "index:org.opencontainers.image.description=창팝위키 미디어위키 스택에서 ${item} 서비스에 사용되는 커스텀 이미지입니다.",
+  ]
 }
 
 target "_common" {
