@@ -9,8 +9,6 @@ x-volumes:
   - &extensions-loader extensions_loader:/var/www/html/extensions-loader
   # 미디어위키 코어에 번들되지 않은 확장과 스킨을 위한 볼륨
   - &non_bundled_extensions non_bundled_extensions:/non-bundled
-  # 로고 파일 마운트
-  - &logo ./resources/logo.svg:/var/www/html/resources/assets/logo.svg
 
 x-setup-base: &x-setup-base
   image: ghcr.io/changpopwiki/wiki-setup:latest
@@ -37,7 +35,7 @@ services:
       - *mediawiki_config
       - *non_bundled_extensions
       - *extensions-loader
-      - *logo
+      - ./mounted/mediawiki/logo.svg:/var/www/html/resources/assets/logo.svg
     networks:
       chp_proxy:
       default:
@@ -63,7 +61,7 @@ services:
       CARGOUSER_PASSWORD: ${CARGOUSER_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
-      - ./build-context/database/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+      - ./mounted/database/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
 
   backup:
     image: ghcr.io/changpopwiki/wiki-backup:latest
