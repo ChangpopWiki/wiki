@@ -309,32 +309,40 @@ def generate_php(cfg: Config, path: str = LOADER_PATH):
           f"(확장 {len(cfg.bundled_extensions) + len(cfg.extensions)}개, "
           f"스킨 {len(cfg.bundled_skins) + len(cfg.skins)}개)")
 
-async def needs_sync(cfg: Config) -> bool:
+async def check_sync(cfg: Config) -> bool:
     expected_ext  = {t.name for t in cfg.extensions}
     expected_skin = {t.name for t in cfg.skins}
     actual_ext    = {e for e in os.listdir(EXT_DIR) if os.path.isdir(f"{EXT_DIR}/{e}")}
     actual_skin   = {s for s in os.listdir(SKIN_DIR) if os.path.isdir(f"{SKIN_DIR}/{s}")}
 
-    missing_ext   = expected_ext - actual_ext
-    orphan_ext    = actual_ext - expected_ext
-    missing_skin  = expected_skin - actual_skin
-    orphan_skin   = actual_skin - expected_skin
+    missing_ext = expected_ext - actual_ext
+    missing_skin = expected_skin - actual_skin
+    orphan_ext = actual_ext - expected_ext
+    orphan_skin = actual_skin - expected_skin
 
     if missing_ext:
         print(f"  누락된 확장: {missing_ext}")
     if missing_skin:
         print(f"  누락된 스킨: {missing_skin}")
-
     if orphan_ext:
-        print(f"  미등록 확장 디렉토리 삭제 중: {orphan_ext}")
-        for name in orphan_ext:
-            shutil.rmtree(f"{EXT_DIR}/{name}")
+        print(f"  미등록 확장: {orphan_ext}")
     if orphan_skin:
-        print(f"  미등록 스킨 디렉토리 삭제 중: {orphan_skin}")
-        for name in orphan_skin:
-            shutil.rmtree(f"{SKIN_DIR}/{name}")
+        print(f"  미등록 스킨: {orphan_skin}")
 
-    return bool(missing_ext or orphan_ext or missing_skin or orphan_skin)
+    return bool(missing_ext or missing_skin or orphan_ext or orphan_skin)
+
+def clean_orphans(cfg: Config):
+    expected_ext  = {t.name for t in cfg.extensions}
+    expected_skin = {t.name for t in cfg.skins}
+    actual_ext    = {e for e in os.listdir(EXT_DIR) if os.path.isdir(f"{EXT_DIR}/{e}")}
+    actual_skin   = {s for s in os.listdir(SKIN_DIR) if os.path.isdir(f"{SKIN_DIR}/{s}")}
+
+    for name in actual_ext - expected_ext:
+        print(f"  미등록 확장 삭제: {name}")
+        shutil.rmtree(f"{EXT_DIR}/{name}")
+    for name in actual_skin - expected_skin:
+        print(f"  미등록 스킨 삭제: {name}")
+        shutil.rmtree(f"{SKIN_DIR}/{name}")
 
 # ── 진입점 ─────────────────────────────────────────────────
 
@@ -343,34 +351,49 @@ async def main():
     os.makedirs(EXT_DIR, exist_ok=True)
     os.makedirs(SKIN_DIR, exist_ok=True)
 
-    if "--generate-loader" in sys.argv:
+    args = set(sys.argv[1:])
+
+    if "--generate-loader" in args:
         generate_php(cfg)
         return
 
-    if "--check" in sys.argv:
+    if "--check" in args:
         print("동기화 상태 확인 중...")
-        sync_needed = await needs_sync(cfg)
+        sync_needed = await check_sync(cfg)
         print("동기화 필요" if sync_needed else "✓ 동기화 불필요")
         raise SystemExit(1 if sync_needed else 0)
 
-    print(f"설치/업데이트 시작 ({len(cfg.extensions)}개 확장, {len(cfg.skins)}개 스킨)...")
+    force = "--force" in args
+
+    if force:
+        print("강제 설치/업데이트 모드 (--force) - 설치 진행")
+    else:
+        sync_needed = await check_sync(cfg)
+        if not sync_needed:
+            print("✓ 동기화 불필요")
+            generate_php(cfg)
+            return
+        print("동기화 필요 — 설치 진행")
+
+    print(f"설치/업데이트 시작 "
+          f"({len(cfg.extensions)}개 확장, {len(cfg.skins)}개 스킨)...")
     semaphore = asyncio.Semaphore(cfg.max_concurrent)
 
     tasks = (
-        [install_ext(t, cfg, semaphore) for t in cfg.extensions] +
-        [install_skin(t, cfg, semaphore) for t in cfg.skins]
+        [install_ext(t, cfg, semaphore) for t in cfg.extensions]
+        + [install_skin(t, cfg, semaphore) for t in cfg.skins]
     )
-
     results = await asyncio.gather(*tasks, return_exceptions=True)
     failures = [r for r in results if isinstance(r, Exception)]
-
-    generate_php(cfg)
 
     if failures:
         print(f"\n[실패 목록] ({len(failures)}개)")
         for e in failures:
             print(f"  ✗ {e}")
         raise SystemExit(1)
+
+    clean_orphans(cfg)
+    generate_php(cfg)
 
     print(f"✓ 전체 {len(tasks)}개 완료")
 

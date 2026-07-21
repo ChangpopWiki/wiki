@@ -42,15 +42,14 @@ services:
 
   setup:
     <<: *x-setup-base
-    command:
-      sh -c "install-extensions --generate-loader && install-extensions --check || install-extensions"
 
   setup-force:
     <<: *x-setup-base
     restart: no
-    profiles: [force-setup]
+    profiles:
+      - setup-force
     command:
-      sh -c "install-extensions --generate-loader && install-extensions"
+      - "--force"
 
   database:
     image: mariadb:lts-ubi
