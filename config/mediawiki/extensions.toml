@@ -60,6 +60,7 @@ PageForms = {branch = "master"}
 ParserPower = {url = "https://github.com/wiki-gg-oss/mediawiki-extensions-ParserPower"}
 Popups = {}
 RedirectManager = {latest_tag = true}
+SaintapediaDrilldown = {url = "https://github.com/Saintapedia/SaintapediaDrilldown", latest_tag = true}
 ShortDescription = {url = "https://github.com/StarCitizenTools/mediawiki-extensions-ShortDescription"}
 TabberNeue = {url = "https://github.com/StarCitizenTools/mediawiki-extensions-TabberNeue", latest_tag = true}
 TemplateSandbox = {}
