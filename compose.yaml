@@ -1,26 +1,23 @@
-x-volumes:
-  # Caddyfile용 디렉토리 마운트
-  - &caddyfile ./config/caddy:/etc/caddy
-  # 미디어위키 이미지 디렉토리 볼륨
-  - &mediawiki_images ./data/images:/var/www/html/images
-  # LocalSettings.php 및 기타 설정 파일을 위한 볼륨
-  - &mediawiki_config ./config/mediawiki:/config
-  # 별도의 확장 로더 파일
-  - &extensions-loader extensions_loader:/var/www/html/extensions-loader
-  # 미디어위키 코어에 번들되지 않은 확장과 스킨을 위한 볼륨
-  - &non_bundled_extensions non_bundled_extensions:/non-bundled
+name: wiki
 
 x-setup-base: &x-setup-base
   image: ghcr.io/changpopwiki/wiki-setup:latest
   volumes:
-    - *non_bundled_extensions
-    - *extensions-loader
-    - *mediawiki_config
+    - non_bundled_extensions:/non-bundled
+    - extensions_loader:/extensions-loader
+    - ./config/mediawiki:/config
 
 services:
   mediawiki:
     image: ghcr.io/changpopwiki/wiki-mediawiki:latest
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "--fail",
+              "http://localhost/api.php?action=query&meta=siteinfo&format=json" ]
+      interval: 30s
+      start_period: 10s
+      start_interval: 1s
+      retries: 3
     depends_on:
       database:
         condition: service_started
@@ -30,12 +27,12 @@ services:
       - path: .env
         required: false
     volumes:
-      - *caddyfile
-      - *mediawiki_images
-      - *mediawiki_config
-      - *non_bundled_extensions
-      - *extensions-loader
-      - ./mounted/mediawiki/logo.svg:/var/www/html/resources/assets/logo.svg
+      - ./data/images:/var/www/html/images
+      - ./config/mediawiki:/var/www/html/config:ro
+      - ./mounted/mediawiki/logo.svg:/var/www/html/resources/assets/logo.svg:ro
+      - ./config/caddy:/etc/caddy:ro
+      - non_bundled_extensions:/non-bundled
+      - extensions_loader:/var/www/html/extensions-loader:ro
     networks:
       chp_proxy:
       default:
@@ -53,7 +50,7 @@ services:
 
   database:
     image: mariadb:lts-ubi
-    restart: always
+    restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
@@ -64,7 +61,7 @@ services:
 
   backup:
     image: ghcr.io/changpopwiki/wiki-backup:latest
-    restart: always
+    restart: unless-stopped
     depends_on:
       database:
         condition: service_started

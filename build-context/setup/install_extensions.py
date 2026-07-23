@@ -14,7 +14,8 @@ from typing import Literal
 
 EXT_DIR  = "/non-bundled/extensions"
 SKIN_DIR = "/non-bundled/skins"
-LOADER_PATH = "/var/www/html/extensions-loader/ExtensionsLoader.php"
+LOADER_PATH = "/extensions-loader/ExtensionsLoader.php"
+CONFIG_PATH = "/config/extensions.toml"
 
 # ── 데이터 클래스 ──────────────────────────────────────────
 
@@ -36,7 +37,7 @@ class Config:
     bundled_skins: list[InstallTarget] = field(default_factory=list)
 
 
-def load_config(path: str = "/config/extensions.toml") -> Config:
+def load_config(path: str = CONFIG_PATH) -> Config:
     print(f"설정 로드 중: {path}")
 
     try:

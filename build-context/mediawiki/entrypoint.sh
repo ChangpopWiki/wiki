@@ -2,7 +2,7 @@
 set -e
 
 # LocalSettings.php 및 non-bundled 확장 심볼릭 링크
-ln -snf /config/LocalSettings.php /var/www/html/LocalSettings.php
+ln -snf /var/www/html/config/LocalSettings.php /var/www/html/LocalSettings.php
 symlink-extensions
 
 # non-bundled 확장 및 스킨 폴더 변경 감지하여
@@ -22,8 +22,8 @@ trap "kill $WATCHER_PID 2>/dev/null" TERM INT
 
 # 웹 서버 권한으로 실행
 if [ "$(id -u)" = '0' ]; then
-    chown -R www-data:www-data /var/www/html/images /var/www/html/cache
-    chown -R www-data:www-data /data/caddy /etc/caddy
+    # 마운트되므로 root로 생성되었을 수 있는 이미지 폴더 권한 보장
+    chown -R www-data:www-data /var/www/html/images
     exec gosu www-data "$@"
 fi
 

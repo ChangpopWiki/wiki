@@ -39,10 +39,12 @@ RUN install-php-extensions \
     luasandbox \
     calendar
 
-# SQLite 데이터 디렉토리 설정
-RUN set -eux; \
-    mkdir -p /var/www/data; \
-    chown -R www-data:www-data /var/www/data
+# 권한 조정
+RUN chown -R www-data:www-data \
+    /var/www/html/images \
+    /var/www/html/cache \
+    /config/caddy \
+    /data/caddy
 
 COPY internal/ /internal/
 
