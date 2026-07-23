@@ -9,7 +9,7 @@ cp .env.example .env
 ```
 [.env.example](.env.example) 파일을 .env 파일로 복사하고 필요한 환경 변수를 채워주세요.
 
-**시크릿**: `./secrets` 디렉토리에 `backup` 서비스에서 페이지 덤프 백업용으로 사용되는 `backup-pages-github-app.pem` 파일이 존재해야 합니다.
+**시크릿**: `var/secrets` 디렉토리에 `backup` 서비스에서 페이지 덤프 백업용으로 사용되는 `backup-pages-github-app.pem` 파일이 존재해야 합니다.
 
 ### 개발 환경
 

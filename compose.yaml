@@ -27,7 +27,7 @@ services:
       - path: .env
         required: false
     volumes:
-      - ./data/images:/var/www/html/images
+      - ./var/images:/var/www/html/images
       - ./config/mediawiki:/var/www/html/config:ro
       - ./mounted/mediawiki/logo.svg:/var/www/html/resources/assets/logo.svg:ro
       - ./config/caddy:/etc/caddy:ro
@@ -90,7 +90,7 @@ services:
       - GITHUB_REPO=${BACKUP_PAGES_GITHUB_REPO}
       - GITHUB_SECRET_KEY_PATH=/run/secrets/backup-pages-github-app-pem
     volumes:
-      - ./data/db_dump:/backup
+      - ./var/db_dump:/backup
     secrets:
       - backup-pages-github-app-pem
 
@@ -105,4 +105,4 @@ networks:
 
 secrets:
   backup-pages-github-app-pem:
-    file: ./secrets/backup-pages-github-app.pem
+    file: ./var/secrets/backup-pages-github-app.pem

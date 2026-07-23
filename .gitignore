@@ -1,10 +1,7 @@
-# 백업
-data/
+var
 
 # 환경변수
 .env
-
-secrets/
 
 # compose override
 compose.override.yaml
