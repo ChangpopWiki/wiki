@@ -23,8 +23,16 @@ services:
         condition: service_started
       setup:
         condition: service_completed_successfully
-    env_file:
-      - path: .env
+    environment:
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - CARGOUSER_PASSWORD=${CARGOUSER_PASSWORD}
+      - WG_SERVER=${WG_SERVER}
+      - WG_SECRET_KEY=${WG_SECRET_KEY}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - CAPTCHA_ANSWERS=${CAPTCHA_ANSWERS}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
     volumes:
       - ./var/images:/var/www/html/images
       - ./config/mediawiki:/var/www/html/config:ro
