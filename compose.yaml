@@ -25,7 +25,6 @@ services:
         condition: service_completed_successfully
     env_file:
       - path: .env
-        required: false
     volumes:
       - ./var/images:/var/www/html/images
       - ./config/mediawiki:/var/www/html/config:ro
@@ -88,11 +87,11 @@ services:
       - GITHUB_APP_ID=${BACKUP_PAGES_GITHUB_APP_ID}
       - GITHUB_INSTALLATION_ID=${BACKUP_PAGES_GITHUB_INSTALLATION_ID}
       - GITHUB_REPO=${BACKUP_PAGES_GITHUB_REPO}
-      - GITHUB_SECRET_KEY_PATH=/run/secrets/backup-pages-github-app-pem
+      - GITHUB_SECRET_KEY_PATH=/run/secrets/backup_pages_github_app_pem
     volumes:
       - ./var/db_dump:/backup
     secrets:
-      - backup-pages-github-app-pem
+      - backup_pages_github_app_pem
 
 volumes:
   db_data:
@@ -104,5 +103,5 @@ networks:
     external: true
 
 secrets:
-  backup-pages-github-app-pem:
-    file: ./var/secrets/backup-pages-github-app.pem
+  backup_pages_github_app_pem:
+    file: ./var/secrets/backup_pages_github_app.pem
