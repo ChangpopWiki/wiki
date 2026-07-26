@@ -46,6 +46,7 @@ if [ -z "${ARG}" ] && [ -t 0 ]; then
 fi
 
 echo "복원 전 현재 DB 백업 중..."
+mkdir -p /backup/daily
 PRE_RESTORE_FILE="/backup/daily/prerestore_$(date +"%Y%m%d_%H%M%S").sql.gz"
 mariadb-dump \
   --host "${MARIADB_HOST}" \
