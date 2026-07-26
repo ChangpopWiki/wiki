@@ -441,7 +441,7 @@ $wgHooks['BeforePageDisplay'][] = function( OutputPage $out, Skin $skin ) {
     <!-- Cloudflare Web Analytics -->
     <script defer src=\'https://static.cloudflareinsights.com/beacon.min.js\' data-cf-beacon=\'{"token": "0ff6e8c00e3d4514889772cd59e7c2ce"}\'></script>
     <!-- End Cloudflare Web Analytics -->
-    <script defer src="/-/stats/script.js" data-website-id="ef773a45-9fe1-4100-8a96-874d9bca2c74"></script>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="ef773a45-9fe1-4100-8a96-874d9bca2c74"></script>
     ');
 };
 
