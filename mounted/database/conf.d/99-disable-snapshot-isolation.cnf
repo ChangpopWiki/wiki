@@ -1,0 +1,3 @@
+# MariaDB 11.6.2+ innodb_snapshot_isolation=ON 기본값이 ExternalData 확장의 ed_url_cache 테이블 동시 갱신을 Error 1020으로 깨서 이전 동작으로 되돌림 (MDEV-35124)
+[mariadb]
+innodb_snapshot_isolation = 0
