@@ -578,5 +578,5 @@ $wgHooks['SpecialPageBeforeExecute'][] = function ( SpecialPage $special, $subPa
 };
 
 # 디버그용 설정 파일이 존재하는 경우 불러오기
-$debugSettings = '/config/DebugSettings.php';
+$debugSettings = "$IP/config/DebugSettings.php";
 if ( file_exists( $debugSettings ) ) { require $debugSettings; }
