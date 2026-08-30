@@ -250,6 +250,10 @@ $wgAutoConfirmCount = 1; # 1회 이상
 
 # --- 그 외 설정 ---
 
+# 성능 제한 변경
+$wgMaxArticleSize = 4096;
+$wgAPIMaxResultSize = $wgMaxArticleSize * 4096;
+
 # 외부 이미지 허용
 $wgAllowExternalImages = true;
 $wgAllowExternalImagesFrom = [
@@ -367,6 +371,15 @@ $wgExternalDataSources['틀데이터'] = [
 	'use jsonpath' => true,
 	'hidden' => true,
 	'min cache seconds' => 86400
+];
+
+$wgExternalDataSources['가사목록'] = [
+	'url' => $wgInternalServer . $wgScriptPath . '/api.php?action=query&list=allpages&apnamespace=3200&apprefix=$문서$&format=json',
+	'params' => ['문서'],
+	'format' => 'json',
+	'use jsonpath' => true,
+	'hidden' => true,
+	'min cache seconds' => 0
 ];
 
 $wgExternalDataSources['*']['min cache seconds'] = 0;
