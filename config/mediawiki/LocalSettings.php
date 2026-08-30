@@ -373,15 +373,6 @@ $wgExternalDataSources['틀데이터'] = [
 	'min cache seconds' => 86400
 ];
 
-$wgExternalDataSources['가사목록'] = [
-	'url' => $wgInternalServer . $wgScriptPath . '/api.php?action=query&list=allpages&apnamespace=3200&apprefix=$문서$&format=json',
-	'params' => ['문서'],
-	'format' => 'json',
-	'use jsonpath' => true,
-	'hidden' => true,
-	'min cache seconds' => 0
-];
-
 $wgExternalDataSources['*']['min cache seconds'] = 0;
 
 # -- PageForms --
@@ -589,6 +580,11 @@ $wgHooks['SpecialPageBeforeExecute'][] = function ( SpecialPage $special, $subPa
 
     return true;
 };
+
+# 설정 디렉토리에 있는 추가 설정 파일들을 불러오기
+foreach ( glob( "$IP/config/LocalSettings.d/*.php" ) as $file ) {
+    require_once $file;
+}
 
 # 디버그용 설정 파일이 존재하는 경우 불러오기
 $debugSettings = "$IP/config/DebugSettings.php";
