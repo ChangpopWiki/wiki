@@ -6,11 +6,11 @@ $wgHooks['ParserFirstCallInit'][] = static function ( \Parser $parser ) {
             ->mMagicExtensions['가사문서목록'] = [ '가사문서목록', '가사문서목록' ];
 
     // 위키텍스트에서 {{#가사문서목록: <곡문서이름> }} 과 같이 사용 가능.
-    // 해당 곡 문서의 모든 가사 변형 문서를 ';;' 구분자로 연결된 문자열로 출력합니다.
+    // 해당 곡 문서의 기본 가사를 제외한 모든 가사 변형 문서를 ';;' 구분자로 연결된 문자열로 출력합니다.
     $parser->setFunctionHook(
             '가사문서목록',
             static function ( \Parser $parser, $song = '' ) {
-                $song = trim( $song );
+                $song = html_entity_decode( trim( $song ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 
                 if ( $song === '' ) {
                     return '';
