@@ -260,6 +260,13 @@ $wgAllowExternalImagesFrom = [
 	'https://i.ytimg.com/' # 유튜브 썸네일
 ];
 
+# Sitemap REST API 활성화
+$wgSitemapApiConfig['enabled'] = true;
+$wgRestAPIAdditionalRouteFiles[] = 'includes/Rest/site.v1.json';
+
+# Sitemap 대상 이름공간 지정
+$wgSitemapNamespaces = [NS_MAIN, NS_PROJECT];
+
 ## 점검 기능 비활성화
 $wgUseRCPatrol = false;
 $wgUseNPPatrol = false;
@@ -299,6 +306,27 @@ $wgHooks['LinkerMakeExternalLink'][] = function( &$url, &$text, &$link, &$attrib
     }
 
     return true;
+};
+
+# 가사 이름공간에서 본 문서로 canonical url을 지정합니다.
+$wgHooks['BeforePageDisplay'][] = static function ( $out, $skin ) {
+    $title = $out->getTitle();
+
+    # 가사 이름공간이 아니라면 적용하지 않습니다.
+    if ( !$title || $title->getNamespace() !== NS_LYRIC ) {
+        return;
+    }
+
+    # 본 문서 구하기
+    $mainTitle = MediaWiki\Title\Title::newFromText(
+        $title->getBaseText(),
+        NS_MAIN
+    );
+
+    # 본 문서가 존재하면 canonical url로 지정
+    if ( $mainTitle && $mainTitle->exists() ) {
+        $out->setCanonicalUrl( $mainTitle->getCanonicalURL() );
+    }
 };
 
 # 표시 제목 허용

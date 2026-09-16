@@ -1,0 +1,14 @@
+User-agent: *
+
+Disallow: /index.php
+
+# Actions URL
+Disallow: /*/+/*
+Allow: /*/+/history
+Allow: /*/+/info
+Allow: /*/+/pagevalues
+
+Disallow: /특수:Drilldown
+Disallow: /특수:링크최근바뀜
+
+Sitemap: https://changpop.wiki/rest.php/site/v1/sitemap/0

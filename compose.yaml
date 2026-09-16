@@ -39,6 +39,7 @@ services:
       - ./config/mediawiki:/var/www/html/config:ro
       - ./mounted/mediawiki/logo.svg:/var/www/html/resources/assets/logo.svg:ro
       - ./config/caddy:/etc/caddy:ro
+      - ./config/robots.txt:/var/www/html/robots.txt:ro
       - non_bundled_extensions:/non-bundled
       - extensions_loader:/var/www/html/extensions-loader:ro
     networks:
