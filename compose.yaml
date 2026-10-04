@@ -38,6 +38,7 @@ services:
       - ./var/images:/var/www/html/images
       - ./config/mediawiki:/var/www/html/config:ro
       - ./mounted/mediawiki/logo.svg:/var/www/html/resources/assets/logo.svg:ro
+      - ./mounted/mediawiki/static_images:/var/www/html/static_images:ro
       - ./config/caddy:/etc/caddy:ro
       - ./config/robots.txt:/var/www/html/robots.txt:ro
       - non_bundled_extensions:/non-bundled
