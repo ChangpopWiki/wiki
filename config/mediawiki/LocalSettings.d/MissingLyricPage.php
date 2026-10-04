@@ -78,7 +78,7 @@ class SpecialMissingLyricPages extends QueryPage  {
 }
 
 // 등록
-$wgAutoloadClasses['SpecialMissingPages'] = __FILE__;
+$wgAutoloadClasses['SpecialMissingLyricPages'] = __FILE__;
 $wgSpecialPages['MissingLyricPages'] = static function () {
     return new SpecialMissingLyricPages();
 };
