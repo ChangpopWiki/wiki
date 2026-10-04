@@ -20,6 +20,16 @@
 }
 
 :9090 {
+	# 구글 시트 API 키를 MediaWiki(Apiunto 확장)에 노출하지 않기 위한 프록시.
+	# LocalSettings.php/Lua 모듈은 키 없이 이 경로만 호출하고,
+	# 실제 키는 여기서 X-Goog-Api-Key 헤더로 얹어 전달합니다.
+	handle_path /internal/sheets-proxy/* {
+		reverse_proxy https://sheets.googleapis.com {
+			header_up Host sheets.googleapis.com
+			header_up X-Goog-Api-Key "{$GOOGLE_API_KEY}"
+		}
+	}
+
 	root * /internal
 	php_server
 }

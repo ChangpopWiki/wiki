@@ -46,15 +46,18 @@ Vector = {}
 [extensions]
 AdminLinks = {branch = "master"}
 ArrayFunctions = {}
+Apiunto = {url = "https://github.com/StarCitizenTools/mediawiki-extensions-Apiunto"}
 Cargo = {branch = "master"}
 Changpopwiki = {url = "https://github.com/Changpopwiki/extension"}
 CharInsert = {}
 CodeMirror = {}
 DataTransfer = {branch = "master"}
+Description2 = {}
 DISPLAYCAT = {url = "https://github.com/tesinormed/mediawiki-extensions-DISPLAYCAT.git"}
 DisplayTitle = {}
 EmbedVideo = {url = "https://github.com/StarCitizenWiki/mediawiki-extensions-EmbedVideo", latest_tag = true}
 ExternalData = {branch = "master"}
+FloatingUI = {url = "https://github.com/StarCitizenTools/mediawiki-extensions-FloatingUI", latest_tag = true}
 Josa = {}
 PageForms = {branch = "master"}
 ParserPower = {url = "https://github.com/wiki-gg-oss/mediawiki-extensions-ParserPower"}

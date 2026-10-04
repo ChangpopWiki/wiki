@@ -403,6 +403,16 @@ $wgExternalDataSources['틀데이터'] = [
 
 $wgExternalDataSources['*']['min cache seconds'] = 0;
 
+# -- Apiunto --
+
+$wgApiuntoSources = [
+    '일간신창섭최근목록' => [
+        'baseUrl' => 'http://mediawiki:9090/internal/sheets-proxy/v4/spreadsheets/1m1v8PC-et8fnCr2nSmp9xhagvo70pCmSrRvUJO3jKiQ/values/시트1',
+        'timeout' => 5,
+        'cacheDuration' => 300,
+    ],
+];
+
 # -- PageForms --
 # 클래스 생성 제한
 $wgGroupPermissions['user']['createclass'] = false;
