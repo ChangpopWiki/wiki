@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -eo pipefail
 
 # ------------------------------------------------------------------
 # 사용법:
@@ -18,7 +18,7 @@ set -e
 #   restore_db.sh remote:daily/20260628_060000.sql.gz
 #   restore_db.sh legacy_wiki.sql --database changpopwiki
 #   docker compose exec -T backup restore_db.sh < my-backup.sql.gz
-#   just restore < my-backup.sql.gz
+#   just restore-db < my-backup.sql.gz
 # ------------------------------------------------------------------
 
 ARG=""
@@ -45,16 +45,26 @@ if [ -z "${ARG}" ] && [ -t 0 ]; then
     exit 1
 fi
 
-echo "복원 전 현재 DB 백업 중..."
 mkdir -p /backup/daily
 PRE_RESTORE_FILE="/backup/daily/prerestore_$(date +"%Y%m%d_%H%M%S").sql.gz"
-mariadb-dump \
-  --host "${MARIADB_HOST}" \
-  --user root \
-  --password="${MARIADB_ROOT_PASSWORD}" \
-  --single-transaction \
-  --no-tablespaces \
-  --databases changpopwiki changpopwiki_cargo | gzip > "${PRE_RESTORE_FILE}" || echo "기존 DB 없음, 백업 건너뜀"
+
+# DB가 아예 없는 경우(최초 복원)에만 백업을 건너뛰고,
+# DB가 있는데 덤프가 실패하면 백업 없이 덮어쓰지 않도록 복원을 중단
+if [ -n "$(mariadb --host "${MARIADB_HOST}" --user root --password="${MARIADB_ROOT_PASSWORD}" \
+    -N -e "SHOW DATABASES LIKE 'changpopwiki'")" ]; then
+    echo "복원 전 현재 DB 백업 중..."
+    mariadb-dump \
+      --host "${MARIADB_HOST}" \
+      --user root \
+      --password="${MARIADB_ROOT_PASSWORD}" \
+      --single-transaction \
+      --no-tablespaces \
+      --databases changpopwiki changpopwiki_cargo | gzip > "${PRE_RESTORE_FILE}" \
+        || { rm -f "${PRE_RESTORE_FILE}"; echo "복원 전 백업 실패 — 복원을 중단합니다"; exit 1; }
+    echo "복원 전 백업 완료: ${PRE_RESTORE_FILE}"
+else
+    echo "기존 DB 없음, 백업 건너뜀"
+fi
 
 # 주어진 파일 경로가 gzip인지 판별 (매직바이트 1f8b)
 is_gzip_file() {
