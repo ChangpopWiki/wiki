@@ -59,6 +59,8 @@ if [ -n "$(mariadb --host "${MARIADB_HOST}" --user root --password="${MARIADB_RO
       --password="${MARIADB_ROOT_PASSWORD}" \
       --single-transaction \
       --no-tablespaces \
+      --ignore-table-data=changpopwiki.objectcache \
+      --ignore-table-data=changpopwiki.l10n_cache \
       --databases changpopwiki changpopwiki_cargo | gzip > "${PRE_RESTORE_FILE}" \
         || { rm -f "${PRE_RESTORE_FILE}"; echo "복원 전 백업 실패 — 복원을 중단합니다"; exit 1; }
     echo "복원 전 백업 완료: ${PRE_RESTORE_FILE}"

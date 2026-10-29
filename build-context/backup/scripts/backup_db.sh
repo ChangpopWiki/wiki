@@ -14,12 +14,16 @@ trap 'rm -f "${TMP_FILE}"' EXIT
 
 echo "백업 시작: ${BACKUP_FILE}"
 
+# 캐시 테이블(objectcache: 세션·파서 캐시 등, l10n_cache: 현지화 캐시)은 구조만 백업하고 데이터는 제외
+# (복원 시 빈 캐시로 시작할 뿐 문제없음. 포함하면 백업 크기가 수 배로 커짐)
 mariadb-dump \
   --host "${MARIADB_HOST}" \
   --user root \
   --password="${MARIADB_ROOT_PASSWORD}" \
   --single-transaction \
   --no-tablespaces \
+  --ignore-table-data=changpopwiki.objectcache \
+  --ignore-table-data=changpopwiki.l10n_cache \
   --databases changpopwiki changpopwiki_cargo | gzip > "${TMP_FILE}"
 
 # mariadb-dump는 정상 종료 시 마지막 줄에 "-- Dump completed" 주석을 남김 (gzip 손상 여부도 함께 확인됨)
