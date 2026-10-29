@@ -9,7 +9,7 @@
 # ///
 """dump-pages backup tool
 
-마디아위키 내부 엔드포인트(dump-pages.php)에서 두 개의 XML 덤프를 받아,
+미디어위키 내부 엔드포인트(dump-pages.php)에서 두 개의 XML 덤프를 받아,
 GitHub App installation token으로 인증한 뒤 GraphQL createCommitOnBranch
 mutation으로 한 커밋에 반영한다. git 저장소를 로컬에 두지 않는다.
 """
@@ -35,6 +35,11 @@ KST = timezone(timedelta(hours=9))
 
 USER_AGENT = "backup-pages"
 
+# 응답 없이 멈췄을 때 다음 예약 실행까지 막히지 않도록 모든 요청에 타임아웃을 지정한다. (단위: 초)
+# 덤프 엔드포인트는 덤프가 끝난 뒤에 응답을 보내므로 덤프 생성 시간까지 고려해 넉넉하게 잡는다.
+API_TIMEOUT = 60
+DUMP_TIMEOUT = 600
+
 
 def create_app_jwt() -> str:
     with open(GITHUB_SECRET_KEY_PATH, "r") as f:
@@ -55,6 +60,7 @@ def get_installation_token(app_jwt: str) -> str:
             "Accept": "application/vnd.github+json",
             "User-Agent": USER_AGENT,
         },
+        timeout=API_TIMEOUT,
     )
     response.raise_for_status()
     return response.json()["token"]
@@ -68,6 +74,7 @@ def get_branch_head_oid(token: str) -> str:
             "Accept": "application/vnd.github+json",
             "User-Agent": USER_AGENT,
         },
+        timeout=API_TIMEOUT,
     )
     response.raise_for_status()
     return response.json()["object"]["sha"]
@@ -97,6 +104,7 @@ def get_existing_oid(token: str, path: str) -> str | None:
             "Authorization": f"Bearer {token}",
             "User-Agent": USER_AGENT,
         },
+        timeout=API_TIMEOUT,
     )
     response.raise_for_status()
     body = response.json()
@@ -138,6 +146,7 @@ def create_commit(token: str, head_oid: str, message: str, all_pages: bytes, lyr
             "Authorization": f"Bearer {token}",
             "User-Agent": USER_AGENT,
         },
+        timeout=API_TIMEOUT,
     )
     response.raise_for_status()
     body = response.json()
@@ -150,9 +159,9 @@ def create_commit(token: str, head_oid: str, message: str, all_pages: bytes, lyr
 
 def main() -> int:
     print("덤프 파일 다운로드 중...")
-    all_pages = requests.get(f"{ENDPOINT}/dump-pages.php")
+    all_pages = requests.get(f"{ENDPOINT}/dump-pages.php", timeout=DUMP_TIMEOUT)
     all_pages.raise_for_status()
-    lyric_only = requests.get(f"{ENDPOINT}/dump-pages.php", params={"filter": "namespace:3200"})
+    lyric_only = requests.get(f"{ENDPOINT}/dump-pages.php", params={"filter": "namespace:3200"}, timeout=DUMP_TIMEOUT)
     lyric_only.raise_for_status()
 
     app_jwt = create_app_jwt()
