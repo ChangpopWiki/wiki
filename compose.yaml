@@ -21,7 +21,7 @@ services:
       retries: 3
     depends_on:
       database:
-        condition: service_started
+        condition: service_healthy
       setup:
         condition: service_completed_successfully
     environment:
@@ -60,6 +60,13 @@ services:
   database:
     image: mariadb:lts-ubi
     restart: unless-stopped
+    # 이미지에 포함된 healthcheck.sh 사용 (DB 초기화 시 자동 생성되는 healthcheck 계정으로 접속)
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 30s
+      start_period: 30s
+      start_interval: 1s
+      retries: 3
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
@@ -74,9 +81,9 @@ services:
     restart: unless-stopped
     depends_on:
       database:
-        condition: service_started
+        condition: service_healthy
       mediawiki:
-        condition: service_started
+        condition: service_healthy
     environment:
       # DB 연결 정보
       - MARIADB_HOST=database
