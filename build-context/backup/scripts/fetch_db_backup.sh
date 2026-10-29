@@ -8,8 +8,8 @@ set -e
 # ------------------------------------------------------------------
 
 if [ -z "$1" ]; then
-    echo "사용법: fetch_backup.sh <파일명>"
-    echo "예시: fetch_backup.sh daily_20260628_060000.sql.gz"
+    echo "사용법: fetch_db_backup.sh <파일명>"
+    echo "예시: fetch_db_backup.sh daily/20260628_060000.sql.gz"
     exit 1
 fi
 
@@ -23,6 +23,6 @@ fi
 
 echo "클라우드에서 다운로드 중: ${FILE}"
 mkdir -p "$(dirname "${LOCAL_PATH}")"
-rclone copyto "${RCLONE_REMOTE}/${FILE}" "${LOCAL_PATH}"
+rclone copyto "${RCLONE_REMOTE}/${FILE}" "${LOCAL_PATH}" --config /dev/null
 [ -f "${LOCAL_PATH}" ] || { echo "다운로드 실패: ${FILE}"; exit 1; }
 echo "다운로드 완료: ${LOCAL_PATH}"

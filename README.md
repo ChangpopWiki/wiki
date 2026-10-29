@@ -70,7 +70,7 @@ setup 서비스와 달리, 확장 목록이 기존에서 변경되지 않았더�
 
 #### DB 백업
 
-데이터베이스를 덤프하고 리모트 백업 저장소인 Backblaze B2에 백업합니다. 생성된 DB 백업은 로컬에서는 [./var/db_dump](./data/db_dump)에서 찾을 수 있습니다.
+데이터베이스를 덤프하고 리모트 백업 저장소인 Backblaze B2에 백업합니다. 생성된 DB 백업은 로컬에서는 [./var/db_dump](./var/db_dump)에서 찾을 수 있습니다.
 `just backup-db`으로 백업을 직접 시작할 수도 있습니다.
 
 자세한 구현은 [backup_db.sh](build-context/backup/scripts/backup_db.sh)을 참고하세요.
@@ -79,7 +79,7 @@ setup 서비스와 달리, 확장 목록이 기존에서 변경되지 않았더�
 
 세 가지 방식으로 복원할 수 있습니다.
 
-1. [./var/db_dump](./var/db_dump)에 존재하는 로컬 백업 파일을 이용하여 복원합니다. `just restore-db {파일경로}`와 같이 실행할 수 있습니다. {{file}}에는 복원할 파일 이름을 지정해야 합니다.
+1. [./var/db_dump](./var/db_dump)에 존재하는 로컬 백업 파일을 이용하여 복원합니다. `just restore-db {파일경로}`와 같이 실행할 수 있습니다. {파일경로}에는 `var/db_dump` 기준 상대 경로(예: `daily/20260628_060000.sql.gz`)를 지정합니다.
 2. 호스트에 존재하는 덤프 파일을 이용하여 복원합니다. `just restore-db < {파일경로}`와 같이 실행할 수 있습니다
 3. 리모트 백업에서 덤프 파일을 스트리밍 받아 복원합니다. `just restore-db remote:{파일경로}`와 같이 복원할 수 있습니다.
 
@@ -95,7 +95,7 @@ daily/monthly 리모트 백업 삭제 정책은 B2 버킷의 라이프사이클 
 
 ##### 작동 방식
 
-mediawiki` 컨테이너에 dumpBackup 스크립트의 결과를 보내기 위한 내부 엔드포인트인 [dump-pages.php](build-context/mediawiki/internal/dump-pages.php)가 존재합니다. [backup_pages.py](build-context/backup/scripts/backup_pages.py) 스크립트는 이 엔드포인트를 호출하여 페이지 덤프를 받아온 뒤 Github API를 통해 백업합니다.
+`mediawiki` 컨테이너에 dumpBackup 스크립트의 결과를 보내기 위한 내부 엔드포인트인 [dump-pages.php](build-context/mediawiki/internal/dump-pages.php)가 존재합니다. [backup_pages.py](build-context/backup/scripts/backup_pages.py) 스크립트는 이 엔드포인트를 호출하여 페이지 덤프를 받아온 뒤 Github API를 통해 백업합니다.
 
 
 
@@ -109,8 +109,8 @@ mediawiki` 컨테이너에 dumpBackup 스크립트의 결과를 보내기 위한
 |--------------------------------------------------------------------------------------------------------------------------------|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `docker compose exec mediawiki curl -s http://localhost:9090/opcache-reset.php`                                                | `reset-opcache`       | LocalSettings.php와 같은 파일의 변경 사항을 컨테이너 재시작 없이 즉시 반영할 수 있습니다. 이는 프로덕션에서 도움이 되는 명령으로, 개발 환경에서는 dev/php-dev.ini가 마운트되며 해당 파일 안에 opcache.revalidate_freq=0이 설정되어 있어 즉시 반영되므로 필요하지 않습니다. |
 | `docker compose exec mediawiki php maintenance/run.php {{args}}`                                                               | `run {{args}}`        | 미디어위키 유지보수 스크립트를 실행합니다. {{args}}에 실행할 스크립트 이름을 지정하세요. (예: `just run update`) 일부 스크립트들은 run까지 생략한 단축을 제공합니다 (예: `just update`) 자세한 목록은 [Justfile](Justfile)을 참고하세요.                                   |
-| `docker compose exec backup backup-db.sh`                                                                                      | `backup-db`           | DB 백업을 수동으로 실행합니다.                                                                                                                                                                                                                                             |
-| `docker compose exec backup restore-db.sh {{file}}`                                                                            | `restore-db {{file}}` | DB 덤프로부터 DB를 복원합니다.                                                                                                                                                                                                                                             |
+| `docker compose exec backup backup_db.sh`                                                                                      | `backup-db`           | DB 백업을 수동으로 실행합니다.                                                                                                                                                                                                                                             |
+| `docker compose exec backup restore_db.sh {{file}}`                                                                            | `restore-db {{file}}` | DB 덤프로부터 DB를 복원합니다.                                                                                                                                                                                                                                             |
 | `docker compose exec backup fetch_db_backup.sh`                                                                                | `fetch-db-backup`     | DB 백업 파일을 리모트에서 가져옵니다.                                                                                                                                                                                                                                      |
 | `docker compose exec backup backup_pages.py`                                                                                   | `backup-pages`        | 위키 페이지 백업을 수동으로 실행합니다.                                                                                                                                                                                                                                    |
 | `docker compose up setup`                                                                                                      | `up setup`            | `setup` 서비스를 수동으로  실행합니다. 이 서비스는 전체 compose up 시에 이미 실행되지만, 수동 시작은 컨테이너 재시작 없이 [extensions.toml](config/mediawiki/extensions.toml) 목록을 바꾸고 변경 사항을 반영하는 데 유용합니다.                                            |

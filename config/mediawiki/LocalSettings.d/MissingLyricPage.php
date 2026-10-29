@@ -1,9 +1,8 @@
 <?php
-// SpecialMissingPages 클래스 정의
+// SpecialMissingLyricPages 클래스 정의
 // 분류명과 이름공간 모두 고정 (LocalSettings.php에 정의된 NS_ 상수 사용)
 // MW 1.44+ categorylinks 스키마: cl_to 대신 linktarget 테이블 통한 cl_target_id 사용
 
-use MediaWiki\MediaWikiServices;
 use MediaWiki\SpecialPage\QueryPage;
 use MediaWiki\Title\Title;
 
