@@ -40,6 +40,13 @@ $wgServer = getenv('WG_SERVER') ?: 'http://localhost:10597';
 ## 내부 서버 주소
 $wgInternalServer = 'http://localhost';
 
+## 리버스 프록시(chp_proxy) 뒤에서 실제 방문자 IP를 인식하기 위한 신뢰 프록시 대역
+## 지정하지 않으면 모든 방문자가 프록시 컨테이너 IP로 인식되어
+## IP 기반 차단·속도 제한·임시 계정 생성 제한을 위키 전체가 공유하게 됩니다.
+## 프록시 컨테이너 IP와 네트워크 대역은 재생성 시 바뀔 수 있어 Docker 브리지 사설 대역 전체를 지정합니다.
+## (포트를 공개하지 않으므로 이 대역에서 접속 가능한 것은 같은 Docker 네트워크의 컨테이너뿐)
+$wgCdnServersNoPurge = [ '172.16.0.0/12' ];
+
 ## The URL path to static resources (images, scripts, etc.)
 $wgResourceBasePath = $wgScriptPath;
 
