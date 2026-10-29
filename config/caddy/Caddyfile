@@ -11,6 +11,9 @@
 		path /images/deleted/*
 		path /images/temp/*
 		path /includes/*
+		# 마운트된 설정 디렉터리 (extensions.toml 노출, LocalSettings.d/*.php 직접 실행 방지)
+		path /config/*
+		path /extensions-loader/*
 	}
 	respond @blocked 403
 
