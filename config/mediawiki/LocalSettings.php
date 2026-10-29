@@ -514,19 +514,21 @@ function requireTurnstileIfNeeded( OutputPage $out, WebRequest $request, User $u
     if ( $request->wasPosted() && $request->getVal('cf-turnstile-response') ) {
         $response = $request->getVal('cf-turnstile-response');
 
-        $verify = file_get_contents( "https://challenges.cloudflare.com/turnstile/v0/siteverify", false, stream_context_create( [
-            'http' => [
-                'method' => 'POST',
-                'header' => 'Content-type: application/x-www-form-urlencoded',
-                'content' => http_build_query( [
+        # Cloudflare 응답이 늦어져도 웹 요청이 오래 붙잡히지 않도록 타임아웃 지정 (실패 시 null)
+        $verify = MediaWiki\MediaWikiServices::getInstance()->getHttpRequestFactory()->post(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+            [
+                'postData' => [
                     'secret' => TURNSTILE_SECRET_KEY,
                     'response' => $response,
                     'remoteip' => $request->getIP(),
-                ] )
-            ]
-        ] ) );
+                ],
+                'timeout' => 5,
+            ],
+            __FUNCTION__
+        );
 
-        $result = json_decode( $verify, true );
+        $result = json_decode( $verify ?? '', true );
         if ( !empty( $result['success'] ) ) {
             $session->set( 'turnstile_passed', time() );
             $session->persist();
