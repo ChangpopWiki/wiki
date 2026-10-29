@@ -231,6 +231,15 @@ async def get_latest_tag(url: str) -> tuple[str, str] | None:
 
 # ── 설치 로직 ──────────────────────────────────────────────
 
+def skip_unresolved(name: str, dest: str, url: str, reason: str):
+    """
+    원격 브랜치/태그를 확인하지 못했을 때 기존 버전을 유지하고 스킵.
+    스킵해도 로더에는 포함되므로, 설치된 적 없는 확장이면 미디어위키가 fatal 오류를 내지 않도록 실패로 처리.
+    """
+    if not os.path.exists(dest):
+        raise RuntimeError(f"[{name}] {reason} — 설치된 버전이 없어 진행할 수 없음: {url}")
+    print(f"[{name}] ⚠ {reason} — 기존 버전 유지, 스킵 (수동 확인 권장)")
+
 async def install(
     kind: Literal["extensions", "skins"],
     target: InstallTarget,
@@ -249,14 +258,14 @@ async def install(
         if target.latest_tag:
             resolved = await get_latest_tag(url)
             if not resolved:
-                print(f"[{name}] ⚠ latest 태그 확인 불가 — 스킵")
+                skip_unresolved(name, dest, url, "latest 태그 확인 불가")
                 return
             resolved_branch, remote_hash = resolved
             label = f"태그 {resolved_branch} (latest release)"
         else:
             resolved = await resolve_branch(url, primary, target.branch is not None)
             if not resolved:
-                print(f"[{name}] ⚠ 원격 브랜치 확인 불가 — 스킵 (수동 확인 권장)")
+                skip_unresolved(name, dest, url, "원격 브랜치 확인 불가")
                 return
             resolved_branch, remote_hash = resolved
             label = f"{resolved_branch} (폴백)" if resolved_branch != primary else resolved_branch
