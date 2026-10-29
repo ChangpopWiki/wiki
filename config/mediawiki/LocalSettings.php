@@ -254,10 +254,13 @@ $wgAutoConfirmCount = 1; # 1회 이상
 $wgMaxArticleSize = 4096;
 $wgAPIMaxResultSize = $wgMaxArticleSize * 4096;
 
-# 외부 이미지 허용
-$wgAllowExternalImages = true;
+# 지정한 주소의 외부 이미지만 허용
 $wgAllowExternalImagesFrom = [
-	'https://i.ytimg.com/' # 유튜브 썸네일
+	"$wgServer/static_images/", # 정적 이미지
+	"$wgServer/resources/assets/", # 로고 등 MediaWiki 기본 에셋
+	'https://i.ytimg.com/', # 유튜브 썸네일
+	'https://yt3.ggpht.com/', # 유튜브 채널 프로필 사진
+	'https://upload.wikimedia.org/wikipedia/commons/', # 위키미디어 공용 아이콘 (틀:고지문)
 ];
 
 # Sitemap REST API 활성화
