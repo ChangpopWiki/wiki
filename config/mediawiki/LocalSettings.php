@@ -304,7 +304,8 @@ $wgHooks['LinkerMakeExternalLink'][] = function( &$url, &$text, &$link, &$attrib
     }
 
     # 외부 링크 문법을 사용하지만 실제로는 내부 링크인 링크는 원래대로 현재 탭에서 열리도록
-    if ( strpos( $url, $wgServer ) !== false ) {
+    # (쿼리 등에 사이트 주소가 포함된 외부 링크를 내부 링크로 오판하지 않도록 호스트를 비교)
+    if ( parse_url( $url, PHP_URL_HOST ) === parse_url( $wgServer, PHP_URL_HOST ) ) {
         unset( $attribs['target'] );
     }
 
