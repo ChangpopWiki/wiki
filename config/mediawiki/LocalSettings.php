@@ -100,6 +100,13 @@ $wgSharedTables[] = "actor";
 $wgMainCacheType = CACHE_ACCEL;
 $wgMemCachedServers = [];
 
+# 세션과 파서 캐시는 DB(objectcache 테이블)에 저장
+# APCu(32MB)에 두면 가득 찰 때마다 캐시 전체가 비워져 로그인한 사용자가 로그아웃되고,
+# 컨테이너를 재시작할 때도 세션과 파서 캐시가 모두 사라집니다.
+# (본 문서 1,000개 기준 파서 캐시 약 20MB, 1일 후 만료되어 정리됨)
+$wgSessionCacheType = CACHE_DB;
+$wgParserCacheType = CACHE_DB;
+
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
 $wgEnableUploads = true;
