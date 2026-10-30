@@ -3,8 +3,5 @@ var
 # 환경변수
 .env
 
-# compose override
-compose.override.yaml
-
 .idea
 

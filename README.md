@@ -13,12 +13,10 @@ cp .env.example .env
 
 ### 개발 환경
 
-[scripts/set-dev.sh](scripts/set-dev.sh) 스크립트를 실행하면 개발 환경이 활성화됩니다. 
-이 스크립트는 [compose.dev.yaml](compose.dev.yaml)을 compose.override.yaml으로, 
-[DebugSettings.example.php](config/mediawiki/DebugSettings.example.php)을 DebugSettings.php로 복사합니다. 
-기존 파일이 존재하면 덮어쓰지 않습니다. 
-[scripts/clear-dev.sh](scripts/clear-dev.sh) 스크립트는 해당 파일들을 삭제해 개발 환경을 해제합니다. 
-각각 `just set-dev`, `just clear-dev`로 빠른 실행이 가능합니다.
+.env 파일에서 `COMPOSE_FILE=compose.yaml:compose.dev.yaml` 줄의 주석을 해제하면 개발 환경이 활성화됩니다. 
+[compose.dev.yaml](compose.dev.yaml)이 병합되어 이미지를 로컬에서 빌드하고, `MW_DEBUG` 환경변수가 설정되어 
+[DebugSettings.php](config/mediawiki/DebugSettings.php)의 디버그 설정이 적용됩니다. 
+다시 주석 처리하면 개발 환경이 해제됩니다.
 
 개발 환경에서의 기본 서비스 포트는 http://localhost:10597 입니다. `DEV_SERVICE_PORT` 환경 변수로 변경 가능합니다.
 
@@ -116,5 +114,3 @@ daily/monthly 리모트 백업 삭제 정책은 B2 버킷의 라이프사이클 
 | `docker compose up setup`                                                                                                      | `up setup`            | `setup` 서비스를 수동으로  실행합니다. 이 서비스는 전체 compose up 시에 이미 실행되지만, 수동 시작은 컨테이너 재시작 없이 [extensions.toml](config/mediawiki/extensions.toml) 목록을 바꾸고 변경 사항을 반영하는 데 유용합니다.                                            |
 | `docker compose up setup-force`                                                                                                | `up setup-force`      | `setup` 서비스는 확장 목록이 기존에서 변경되지 않았다면 설치 스크립트를 진행하지 않습니다. 확장 강제 업데이트가 필요한 경우 대신 setup-force 서비스를 이용할 수 있습니다.                                                                                                  |
 | `./scripts/setup_b2_retention.sh`                                                                                              | `setup-b2-retention`  | B2 리모트 버킷에 리텐션 정책을 적용합니다.                                                                                                                                                                                                                                 |
-| `./scripts/set-dev.sh`                                                                                                         | `set-dev`             | 개발 환경 설정 (compose.override.yaml, DebugSettings.php 생성). 기존 파일은 덮어쓰지 않습니다.                                                                                                                                                                             |
-| `./scripts/clear-dev.sh`                                                                                                       | `clear-dev`           | 개발 환경 해제 (compose.override.yaml, DebugSettings.php 삭제).                                                                                                                                                                                                            |

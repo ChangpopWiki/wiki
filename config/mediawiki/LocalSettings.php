@@ -644,6 +644,5 @@ foreach ( glob( "$IP/config/LocalSettings.d/*.php" ) as $file ) {
     require_once $file;
 }
 
-# 디버그용 설정 파일이 존재하는 경우 불러오기
-$debugSettings = "$IP/config/DebugSettings.php";
-if ( file_exists( $debugSettings ) ) { require $debugSettings; }
+# 개발 환경(MW_DEBUG)에서 디버그 설정 불러오기
+if ( getenv( 'MW_DEBUG' ) ) { require "$IP/config/DebugSettings.php"; }

@@ -62,11 +62,3 @@ manageJobs *args:
 # B2 리모트 버킷에 리텐션 정책을 적용
 setup-b2-retention:
     ./scripts/setup_b2_retention.sh
-
-# 개발 환경 설정 (기존 파일이 있으면 덮어쓰지 않음)
-set-dev:
-    ./scripts/set-dev.sh
-
-# 개발 환경 해제 (compose.override.yaml, DebugSettings.php 삭제)
-clear-dev:
-    ./scripts/clear-dev.sh
