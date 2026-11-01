@@ -383,9 +383,14 @@ $wgEmbedVideoRequireConsent = false;
 
 define('GOOGLE_API_KEY', getenv('GOOGLE_API_KEY'));
 
+# 소스의 url은 호출 시 덮어쓸 수 없으므로 allowed urls는 '*'로 두고,
+# 파라미터는 URL에 인코딩 없이 그대로 들어가므로 param filters로 경로·쿼리 조작을 막음
+
 $wgExternalDataSources['시트'] = [
 	'url' => 'https://sheets.googleapis.com/v4/spreadsheets/1vMnt6hYO662kuluJkDTNkWUCKLEGmS6v3IY4932tKwM/values/$시트명$?key=' . GOOGLE_API_KEY,
 	'params' => ['시트명'],
+	'param filters' => ['시트명' => '/^[^\/?#&%]+$/'],
+	'allowed urls' => '*',
 	'format' => 'json',
 	'use jsonpath' => true,
 	'hidden' => true,
@@ -395,6 +400,8 @@ $wgExternalDataSources['시트'] = [
 $wgExternalDataSources['유튜브'] = [
 	'url' => 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=$id$&key=' . GOOGLE_API_KEY,
 	'params' => ['id'],
+	'param filters' => ['id' => '/^[\w-]+$/'],
+	'allowed urls' => '*',
 	'format' => 'json',
 	'use jsonpath' => true,
 	'hidden' => true,
@@ -404,6 +411,8 @@ $wgExternalDataSources['유튜브'] = [
 $wgExternalDataSources['유튜브채널'] = [
 	'url' => 'https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=$id$&key=' . GOOGLE_API_KEY,
 	'params' => ['id'],
+	'param filters' => ['id' => '/^[\w-]+$/'],
+	'allowed urls' => '*',
 	'format' => 'json',
 	'use jsonpath' => true,
 	'hidden' => true,
@@ -413,6 +422,8 @@ $wgExternalDataSources['유튜브채널'] = [
 $wgExternalDataSources['틀데이터'] = [
 	'url' => $wgInternalServer . $wgScriptPath . '/api.php?action=templatedata&lang=ko&format=json&titles=$틀이름$',
 	'params' => ['틀이름'],
+	'param filters' => ['틀이름' => '/^[^&#]+$/'],
+	'allowed urls' => '*',
 	'format' => 'json',
 	'use jsonpath' => true,
 	'hidden' => true,
@@ -420,6 +431,10 @@ $wgExternalDataSources['틀데이터'] = [
 ];
 
 $wgExternalDataSources['*']['min cache seconds'] = 0;
+
+$wgExternalDataSources['*']['allowed urls'] = [
+	'https://changpop.wiki/premiere-relay-archive/api.php?',
+];
 
 # -- Apiunto --
 
